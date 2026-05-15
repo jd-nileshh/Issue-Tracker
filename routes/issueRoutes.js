@@ -1,36 +1,48 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/' , (req,res)=> {
-    res.send('Get all issues');
-});
+const {
+    createIssue,
+    getIssues,
+    getIssueById,
+    updateIssue,
+    deleteIssue,
+    assignIssue,
+    updateIssueStatus,
+    getIssueActivity
+} = require('../controllers/issueController');
 
-router.post('/' , (req,res) => {
-    res.send('Create issue');
-});
 
-router.get('/:id', (req,res) => {
-    res.send('Get issue by id');
-});
+// 🔹 Get all issues
+router.get('/', getIssues);
 
-router.patch('/:id', (req,res) => {
-    res.send('Update issue');
-});
 
-router.delete('/:id',(req,res) => {
-    res.send('Delete issue');
-});
+// 🔹 Create new issue
+router.post('/', createIssue);
 
-router.patch('/:id/assign' , (req,res) => {
-    res.send('Assign issue');
-});
 
-router.patch('/:id/status' , (req,res) => {
-    res.send('Update issue status');
-});
+// 🔹 Get issue by ID
+router.get('/:id', getIssueById);
 
-router.get('/:id/activity' , (req,res) => {
-    res.send('Get issue activity');
-});
+
+// 🔹 Update issue
+router.patch('/:id', updateIssue);
+
+
+// 🔹 Delete issue
+router.delete('/:id', deleteIssue);
+
+
+// 🔹 Assign issue
+router.patch('/:id/assign', assignIssue);
+
+
+// 🔹 Update issue status
+router.patch('/:id/status', updateIssueStatus);
+
+
+// 🔹 Get issue activity logs
+router.get('/:id/activity', getIssueActivity);
+
 
 module.exports = router;

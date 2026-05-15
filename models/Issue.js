@@ -35,7 +35,7 @@ const issueSchema = new mongoose.Schema ({
         ref:"User",
         required: true
     },
-    asignee:{
+    assignee:{
         type: mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
