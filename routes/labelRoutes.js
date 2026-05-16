@@ -1,20 +1,31 @@
 const express = require('express');
-const router = express.Router({mergeParams: true});
 
-router.get('/',(req,res) => {
-    res.send('Get labels for projects ' + req.params.projectId);
+const router = express.Router({
+    mergeParams: true
 });
 
-router.post('/',(req,res) => {
-    res.send('Create labels for projects' + req.params.projectId);
-});
+const {
+    createLabel,
+    getLabels,
+    updateLabel,
+    deleteLabel
+} = require('../controllers/labelController');
 
-router.patch('/:id', (req,res) => {
-    res.send('Update labels');
-});
 
-router.delete('/:id' ,(req,res) => {
-    res.send('Delete labels');
-});
+// 🔹 Get all labels for a project
+router.get('/', getLabels);
+
+
+// 🔹 Create label
+router.post('/', createLabel);
+
+
+// 🔹 Update label
+router.patch('/:id', updateLabel);
+
+
+// 🔹 Delete label
+router.delete('/:id', deleteLabel);
+
 
 module.exports = router;

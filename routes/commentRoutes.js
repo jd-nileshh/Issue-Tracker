@@ -1,20 +1,31 @@
 const express = require('express');
-const router = express.Router({mergeParams : true});
 
-router.get('/' , (req,res) => {
-    res.send('Get comments for issue ' + req.params.issueId);
+const router = express.Router({
+    mergeParams: true
 });
 
-router.post('/' , (req,res) => {
-    res.send('Create comment for issue' + req.params.issueId);
-});
+const {
+    addComment,
+    getComments,
+    updateComment,
+    deleteComment
+} = require('../controllers/commentController');
 
-router.patch('/:id',(req,res) => {
-    res.send('Update comment');
-});
 
-router.delete('/:id' , (req,res) => {
-    res.send('Delete comment');
-});
+// 🔹 Get all comments for an issue
+router.get('/', getComments);
+
+
+// 🔹 Add comment to issue
+router.post('/', addComment);
+
+
+// 🔹 Update comment
+router.patch('/:id', updateComment);
+
+
+// 🔹 Delete comment
+router.delete('/:id', deleteComment);
+
 
 module.exports = router;
