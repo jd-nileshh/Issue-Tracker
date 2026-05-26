@@ -1,94 +1,71 @@
 const User = require('../models/User');
 
-exports.getAllUsers = async (req , res) => {
-    try{
-        const users = await User.find().select('-password');
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/AppError');
 
-        res.status(200).json({
-            success: true,
-            users
-        });
-    }catch(error){
-        res.status(500).json({
-            success : false,
-            message : error.message
-        });
+
+exports.getAllUsers = catchAsync(async (req, res, next) => {
+
+    const users = await User.find().select('-password');
+
+    res.status(200).json({
+        success: true,
+        users
+    });
+});
+
+
+
+exports.getUserById = catchAsync(async (req, res, next) => {
+
+    const user = await User.findById(req.params.id)
+        .select('-password');
+
+    if (!user) {
+        return next(new AppError('User not found', 404));
     }
-};
+
+    res.status(200).json({
+        success: true,
+        user
+    });
+});
 
 
-exports.getUserById = async (req,res) => {
-    try{
 
-        const user = await User.findById(req.params.id).select('-password');
-        if(!user){
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
+exports.updateUser = catchAsync(async (req, res, next) => {
+
+    const { name, avatar } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        { name, avatar },
+        {
+            new: true,
+            runValidators: true
         }
-        res.status(200).json({
-            success: true,
-            user
-        });
-    }catch(error){
-        res.status(500).json({
-            success: false,
-            message : error.message
-        });
+    ).select('-password');
+
+    if (!updatedUser) {
+        return next(new AppError('User not found', 404));
     }
-};
+
+    res.status(200).json({
+        success: true,
+        message: 'User updated successfully',
+        user: updatedUser
+    });
+});
 
 
-exports.updateUser = async (req,res)=> {
-    try{
-        const {name, avatar} = req.body;
 
-        const updatedUser = await User.findByIdAndUpdate(
-            req.params.id,
-            {name,avatar},
-            {
-                new : true,
-                runValidators: true,
-                select:'-password'
-            }
-        );
+exports.deleteUser = catchAsync(async (req, res, next) => {
 
-        if(!updatedUser){
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
-        res.status(200).json({
-            success: true,
-            message: 'User updated successfully',
-            user: updatedUser
-        });
-    }catch(error){
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+    const user = await User.findByIdAndDelete(req.params.id);
+
+    if (!user) {
+        return next(new AppError('User not found', 404));
     }
-};
 
-
-
-exports.deleteUser = async (req, res) => {
-    try {
-        const user = await User.findByIdAndDelete(req.params.id);
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found'
-            });
-        }
-        res.status(204).send();
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-};
+    res.status(204).send();
+});

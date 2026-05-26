@@ -2,120 +2,88 @@ const Comment = require('../models/Comment');
 const User = require('../models/User');
 const ActivityLog = require('../models/ActivityLog');
 
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/AppError');
 
-exports.addComment = async (req, res) => {
-    try{
 
-        const {body, parent} = req.body;
-        const issueId = req.params.issueId;
+exports.addComment = catchAsync(async (req, res, next) => {
 
-        const memberUser = await User.findOne({
-            role : 'member'
-        });
+    const { body, parent } = req.body;
+    const issueId = req.params.issueId;
 
-        if(!memberUser){
-            return res.status(404).json({
-                success: false,
-                message: 'Member user not found'
-            });
-        }
+    const memberUser = await User.findOne({
+        role: 'member'
+    });
 
-        const comment = await Comment.create({
-            body,
-            issue: issueId,
-            author: memberUser._id,
-            parent
-        });
-        res.status(201).json({
-            success: true,
-            message: 'Comment added successfully',
-            comment
-        });
-
-    }catch(error){
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+    if (!memberUser) {
+        return next(new AppError('Member user not found', 404));
     }
-};
+
+    const comment = await Comment.create({
+        body,
+        issue: issueId,
+        author: memberUser._id,
+        parent
+    });
+
+    res.status(201).json({
+        success: true,
+        message: 'Comment added successfully',
+        comment
+    });
+});
 
 
 
-exports.getComments = async(req,res) => {
-    try{
+exports.getComments = catchAsync(async (req, res, next) => {
 
-        const comments = await Comment.find({
-            issue: req.params.issueId
-        })
-        .sort({createdAt: 1 })
-        .populate('author' , 'name');
+    const comments = await Comment.find({
+        issue: req.params.issueId
+    })
+    .sort({ createdAt: 1 })
+    .populate('author', 'name');
 
-        res.status(200).json({
-            success: true,
-            comments
-        });
+    res.status(200).json({
+        success: true,
+        comments
+    });
+});
 
-    }catch(error){
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+
+
+exports.updateComment = catchAsync(async (req, res, next) => {
+
+    const { body } = req.body;
+
+    const comment = await Comment.findById(req.params.id);
+
+    if (!comment) {
+        return next(new AppError('Comment not found', 404));
     }
-};
+
+    comment.body = body;
+
+    await comment.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Comment updated successfully',
+        comment
+    });
+});
 
 
 
-exports.updateComment = async(req,res) => {
-    try{
 
-        const{body} = req.body;
+exports.deleteComment = catchAsync(async (req, res, next) => {
 
-        const comment = await Comment.findById(req.params.id);
-        if(!comment){
-            return res.status(404).json({
-                success: false,
-                message: 'Comment not found'
-            });
-        }
-        comment.body = body;
-        await comment.save();
+    const deletedComment = await Comment.findByIdAndDelete(
+        req.params.id
+    );
 
-        res.status(200).json({
-            success: true,
-            message: 'Comment updated successfully',
-            comment
-        });
-
-    }catch(error){
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+    if (!deletedComment) {
+        return next(new AppError('Comment not found', 404));
     }
-};
 
-
-
-
-exports.deleteComment = async(req,res) => {
-    try{
-
-        const deletedComment = await Comment.findByIdAndDelete(
-            req.params.id
-        );
-        if(!deletedComment){
-            return res.status(404).json({
-                success: false,
-                message: 'Comment not found'
-            });
-        }
-        res.status(204).send();
-
-    }catch(error){
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
-    }
-};
+    res.status(204).send();
+});

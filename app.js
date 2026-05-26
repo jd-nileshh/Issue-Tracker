@@ -33,4 +33,19 @@ app.use('/api/v1/issues',issueRoutes);
 app.use('/api/v1/issues/:issueId/comments',commentRoutes);
 app.use('/api/v1/projects/:projectId/labels',labelRoutes);
 
+
+
+app.use((err, req, res, next) => {
+
+    err.statusCode = err.statusCode || 500;
+    err.status = err.status || 'error';
+
+    res.status(err.statusCode).json({
+        success: false,
+        status: err.status,
+        message: err.message
+    });
+});
+
+
 module.exports = app;
