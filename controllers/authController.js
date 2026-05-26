@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
+const jwt = require('jsonwebtoken');
+const config = require('../config/config');
 
 exports.register = catchAsync(async (req, res, next) => {
 
@@ -37,6 +39,17 @@ exports.login = catchAsync(async (req, res, next) => {
 
     const user = await User.findOne({ email }).select('+password');
 
+    const token = jwt.sign(
+        {
+            id: user._id,
+            role: user.role
+        },
+        config.JWT_SECRET,
+        {
+            expiresIn:'7d'
+        }
+    );
+
     if (!user) {
         return next(new AppError('Invalid credentials', 401));
     }
@@ -50,7 +63,7 @@ exports.login = catchAsync(async (req, res, next) => {
     res.status(200).json({
         success: true,
         message: "Login successful",
-        token: 'Token will be added in later stage',
+        token ,
         user: {
             id: user._id,
             name: user.name,
@@ -65,7 +78,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        message: 'Authentication will be added in stage 15'
+        data: req.user
     });
 });
 

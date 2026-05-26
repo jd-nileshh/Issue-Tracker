@@ -9,20 +9,16 @@ exports.createProject = catchAsync(async (req, res, next) => {
 
     const { title, description } = req.body;
 
-    const adminUser = await User.findOne({ role: 'admin' });
-
-    if (!adminUser) {
-        return next(new AppError('Admin user not found', 404));
-    }
+    
 
     const project = await Project.create({
         title,
         description,
-        owner: adminUser._id,
+        owner: req.user.id,
 
         members: [
             {
-                user: adminUser._id,
+                user: req.user.id,
                 role: 'owner'
             }
         ]

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const{ protect } = require('../middlewares/protect');
 
 const {
     createIssue,
@@ -22,35 +23,35 @@ const { validate } = require('../middlewares/validate');
 
 
 // 🔹 Get all issues
-router.get('/', getIssues);
+router.get('/',protect, getIssues);
 
 
 // 🔹 Create new issue
-router.post('/', createIssueRules , validate , createIssue);
+router.post('/',protect, createIssueRules , validate , createIssue);
 
 
 // 🔹 Get issue by ID
-router.get('/:id', getIssueById);
+router.get('/:id',protect, getIssueById);
 
 
 // 🔹 Update issue
-router.patch('/:id', updateIssue);
+router.patch('/:id',protect, updateIssue);
 
 
 // 🔹 Delete issue
-router.delete('/:id', deleteIssue);
+router.delete('/:id',protect, deleteIssue);
 
 
 // 🔹 Assign issue
-router.patch('/:id/assign', assignIssue);
+router.patch('/:id/assign',protect, assignIssue);
 
 
 // 🔹 Update issue status
-router.patch('/:id/status', updateStatusRules, validate, updateIssueStatus);
+router.patch('/:id/status',protect, updateStatusRules, validate, updateIssueStatus);
 
 
 // 🔹 Get issue activity logs
-router.get('/:id/activity', getIssueActivity);
+router.get('/:id/activity',protect, getIssueActivity);
 
 
 module.exports = router;

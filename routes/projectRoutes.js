@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { protect } = require('../middlewares/protect');
 
 const {
     createProject,
@@ -20,31 +21,31 @@ const { validate } = require('../middlewares/validate');
 
 
 //  Get all projects
-router.get('/', getProjects);
+router.get('/',protect, getProjects);
 
 
 //  Create new project
-router.post('/', createProjectRules , validate , createProject);
+router.post('/',protect, createProjectRules , validate , createProject);
 
 
 //  Get single project
-router.get('/:id', getProjectById);
+router.get('/:id',protect, getProjectById);
 
 
 //  Update project
-router.patch('/:id', updateProjectRules, validate , updateProject);
+router.patch('/:id',protect, updateProjectRules, validate , updateProject);
 
 
 //  Delete project
-router.delete('/:id', deleteProject);
+router.delete('/:id',protect, deleteProject);
 
 
 //  Add project member
-router.post('/:id/members', addMember);
+router.post('/:id/members',protect, addMember);
 
 
 //  Remove project member
-router.delete('/:id/members/:userId', removeMember);
+router.delete('/:id/members/:userId',protect, removeMember);
 
 
 module.exports = router;

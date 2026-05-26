@@ -3,6 +3,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 
 
+
 const app = express();
 
 app.use(express.json());
@@ -25,6 +26,12 @@ const labelRoutes = require('./routes/labelRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const userRoutes = require('./routes/userRoutes');
 
+
+const { notFound } = require('./middlewares/notFound');
+
+const { errorHandler } = require('./middlewares/errorHandler');
+
+
 app.use('/api/v1/auth',authRoutes);
 app.use('/api/v1/users',userRoutes);
 app.use('/api/v1/projects',projectRoutes);
@@ -46,6 +53,11 @@ app.use((err, req, res, next) => {
         message: err.message
     });
 });
+
+app.use(notFound);
+app.use(errorHandler);
+
+
 
 
 module.exports = app;

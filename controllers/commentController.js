@@ -1,7 +1,4 @@
 const Comment = require('../models/Comment');
-const User = require('../models/User');
-const ActivityLog = require('../models/ActivityLog');
-
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 
@@ -11,18 +8,12 @@ exports.addComment = catchAsync(async (req, res, next) => {
     const { body, parent } = req.body;
     const issueId = req.params.issueId;
 
-    const memberUser = await User.findOne({
-        role: 'member'
-    });
-
-    if (!memberUser) {
-        return next(new AppError('Member user not found', 404));
-    }
+   
 
     const comment = await Comment.create({
         body,
         issue: issueId,
-        author: memberUser._id,
+        author: req.user.id,
         parent
     });
 

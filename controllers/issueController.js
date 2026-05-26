@@ -1,7 +1,6 @@
 const Issue = require('../models/Issue');
 const ActivityLog = require('../models/ActivityLog');
-const User = require('../models/User');
-const Label = require('../models/Label');
+
 
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
@@ -20,11 +19,7 @@ exports.createIssue = catchAsync(async (req, res, next) => {
         dueDate
     } = req.body;
 
-    const adminUser = await User.findOne({ role: 'admin' });
-
-    if (!adminUser) {
-        return next(new AppError('Admin user not found', 404));
-    }
+   
 
     const issue = await Issue.create({
         title,
@@ -32,7 +27,7 @@ exports.createIssue = catchAsync(async (req, res, next) => {
         type,
         priority,
         project,
-        reporter: adminUser._id,
+        reporter: req.user.id,
         assignee,
         labels,
         dueDate
@@ -167,11 +162,11 @@ exports.updateIssueStatus = catchAsync(async (req, res, next) => {
 
     await issue.save();
 
-    const adminUser = await User.findOne({ role: 'admin' });
+    
 
     const activityLog = await ActivityLog.create({
         issue: issue._id,
-        actor: adminUser._id,
+        actor: req.user.id,
         action: 'status_changed',
         beforeValue: previousStatus,
         afterValue: status
@@ -205,14 +200,14 @@ exports.assignIssue = catchAsync(async (req, res, next) => {
 
     await issue.save();
 
-    const adminUser = await User.findOne({ role: 'admin' });
+   
 
     const activityLog = await ActivityLog.create({
         issue: issue._id,
-        actor: adminUser._id,
+        actor: req.user.id,
         action: 'assigned',
         beforeValue: previousAssignee,
-        afterValue: assigneeId
+        afterValue: assigneeId.toString()
     });
 
     res.status(200).json({

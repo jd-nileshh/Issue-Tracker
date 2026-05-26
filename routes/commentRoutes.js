@@ -1,4 +1,6 @@
 const express = require('express');
+const {protect} = require('../middlewares/protect');
+
 
 const router = express.Router({
     mergeParams: true
@@ -19,19 +21,19 @@ const { validate } = require('../middlewares/validate');
 
 
 // 🔹 Get all comments for an issue
-router.get('/', getComments);
+router.get('/',protect, getComments);
 
 
 // 🔹 Add comment to issue
-router.post('/', createCommentRules, validate, addComment);
+router.post('/',protect, createCommentRules, validate, addComment);
 
 
 // 🔹 Update comment
-router.patch('/:id', updateComment);
+router.patch('/:id',protect, updateComment);
 
 
 // 🔹 Delete comment
-router.delete('/:id', deleteComment);
+router.delete('/:id',protect, deleteComment);
 
 
 module.exports = router;
