@@ -11,13 +11,19 @@ const {
     deleteComment
 } = require('../controllers/commentController');
 
+const {
+    createCommentRules
+} = require('../validators/commentValidator');
+
+const { validate } = require('../middlewares/validate');
+
 
 // 🔹 Get all comments for an issue
 router.get('/', getComments);
 
 
 // 🔹 Add comment to issue
-router.post('/', addComment);
+router.post('/', createCommentRules, validate, addComment);
 
 
 // 🔹 Update comment

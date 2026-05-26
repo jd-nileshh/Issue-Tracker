@@ -13,12 +13,20 @@ const {
 } = require('../controllers/issueController');
 
 
+const {
+    createIssueRules,
+    updateStatusRules
+} = require('../validators/issueValidator');
+
+const { validate } = require('../middlewares/validate');
+
+
 // 🔹 Get all issues
 router.get('/', getIssues);
 
 
 // 🔹 Create new issue
-router.post('/', createIssue);
+router.post('/', createIssueRules , validate , createIssue);
 
 
 // 🔹 Get issue by ID
@@ -38,7 +46,7 @@ router.patch('/:id/assign', assignIssue);
 
 
 // 🔹 Update issue status
-router.patch('/:id/status', updateIssueStatus);
+router.patch('/:id/status', updateStatusRules, validate, updateIssueStatus);
 
 
 // 🔹 Get issue activity logs

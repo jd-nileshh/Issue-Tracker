@@ -8,9 +8,16 @@ const {
     getMe
 } = require('../controllers/authController');
 
-router.post('/register', register);
+const {
+    registerRules,
+    loginRules
+} = require('../validators/authValidator');
 
-router.post('/login', login);
+const { validate } = require('../middlewares/validate');
+
+router.post('/register', registerRules , validate , register);
+
+router.post('/login', loginRules , validate , login);
 
 router.post('/logout', logout);
 

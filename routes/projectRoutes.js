@@ -11,13 +11,20 @@ const {
     removeMember
 } = require('../controllers/projectController');
 
+const {
+    createProjectRules,
+    updateProjectRules
+} = require('../validators/projectValidator');
+
+const { validate } = require('../middlewares/validate');
+
 
 //  Get all projects
 router.get('/', getProjects);
 
 
 //  Create new project
-router.post('/', createProject);
+router.post('/', createProjectRules , validate , createProject);
 
 
 //  Get single project
@@ -25,7 +32,7 @@ router.get('/:id', getProjectById);
 
 
 //  Update project
-router.patch('/:id', updateProject);
+router.patch('/:id', updateProjectRules, validate , updateProject);
 
 
 //  Delete project
