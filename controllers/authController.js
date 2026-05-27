@@ -39,7 +39,17 @@ exports.login = catchAsync(async (req, res, next) => {
 
     const user = await User.findOne({ email }).select('+password');
 
-    const token = jwt.sign(
+    if (!user) {
+        return next(new AppError('Invalid credentials', 401));
+    }
+    
+    const isMatch = await user.comparePassword(password);
+
+    if (!isMatch) {
+        return next(new AppError('Invalid credentials', 401));
+    }
+
+     const token = jwt.sign(
         {
             id: user._id,
             role: user.role
@@ -49,16 +59,6 @@ exports.login = catchAsync(async (req, res, next) => {
             expiresIn:'7d'
         }
     );
-
-    if (!user) {
-        return next(new AppError('Invalid credentials', 401));
-    }
-
-    const isMatch = await user.comparePassword(password);
-
-    if (!isMatch) {
-        return next(new AppError('Invalid credentials', 401));
-    }
 
     res.status(200).json({
         success: true,

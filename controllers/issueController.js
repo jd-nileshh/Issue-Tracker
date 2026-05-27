@@ -133,13 +133,24 @@ exports.updateIssue = catchAsync(async (req, res, next) => {
 
 exports.deleteIssue = catchAsync(async (req, res, next) => {
 
-    const deletedIssue = await Issue.findByIdAndDelete(
+    const issue = await Issue.findById(
         req.params.id
     );
 
-    if (!deletedIssue) {
+    if (!issue) {
         return next(new AppError('Issue not found', 404));
     }
+
+    if(issue.reporter.toString() !== req.user.id.toString()){
+        return next(
+            new AppError(
+                'You can only delete issues you reported',
+                403
+            )
+        );
+    }
+
+    await issue.deleteOne();
 
     res.status(204).send();
 });
@@ -154,6 +165,15 @@ exports.updateIssueStatus = catchAsync(async (req, res, next) => {
 
     if (!issue) {
         return next(new AppError('Issue not found', 404));
+    }
+
+    if(issue.reporter.toString() !== req.user.id.toString() && (!issue.assignee || issue.assignee.toString() !== req.user.id.toString())){
+        return next(
+            new AppError(
+                'Only the reporter or assignee can update the issue status',
+                403
+            )
+        );
     }
 
     const previousStatus = issue.status;

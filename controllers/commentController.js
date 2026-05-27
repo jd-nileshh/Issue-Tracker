@@ -52,6 +52,15 @@ exports.updateComment = catchAsync(async (req, res, next) => {
         return next(new AppError('Comment not found', 404));
     }
 
+    if(comment.author.toString() !== req.user.id.toString()){
+        return next(
+            new AppError(
+                'You can edit only your comments',
+                403
+            )
+        );
+    }
+
     comment.body = body;
 
     await comment.save();
@@ -68,13 +77,24 @@ exports.updateComment = catchAsync(async (req, res, next) => {
 
 exports.deleteComment = catchAsync(async (req, res, next) => {
 
-    const deletedComment = await Comment.findByIdAndDelete(
+    const comment = await Comment.findById(
         req.params.id
     );
 
-    if (!deletedComment) {
+    if (!comment) {
         return next(new AppError('Comment not found', 404));
     }
+
+    if(comment.author.toString() !== req.user.id.toString()){
+        return next(
+            new AppError(
+                'You can delete your own comments only',
+                403
+            )
+        );
+    }
+
+    await comment.deleteOne();
 
     res.status(204).send();
 });

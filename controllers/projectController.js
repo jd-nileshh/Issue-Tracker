@@ -121,6 +121,15 @@ exports.addMember = catchAsync(async (req, res, next) => {
         return next(new AppError('Project not found', 404));
     }
 
+    if(project.owner.toString() !== req.user.id.toString()){
+        return next(
+            new AppError(
+                'Only the project owner can add members',
+                403
+            )
+        );
+    }
+
     const existingMember = project.members.find(
         member => member.user.toString() === userId
     );
@@ -153,6 +162,15 @@ exports.removeMember = catchAsync(async (req, res, next) => {
 
     if (!project) {
         return next(new AppError('Project not found', 404));
+    }
+
+    if(project.owner.toString() !== req.user.id.toString()){
+        return next(
+            new AppError(
+                'Only the project owner can remove members',
+                403
+            )
+        );
     }
 
     project.members = project.members.filter(
