@@ -2,15 +2,40 @@ const User = require('../models/User');
 
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
+const{applyPagination} = require('../utils/queryHelper');
 
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
 
-    const users = await User.find().select('-password');
+    const filter = {};
+
+    if (req.query.search) {
+        const regex = new RegExp(
+            req.query.search,
+            'i'
+        );
+
+        filter.$or = [
+            { name: regex },
+            { email: regex }
+        ];
+    }
+
+    let query = User.find(filter)
+        .select('-password');
+
+    query = applyPagination(
+        query,
+        req.query
+    );
+
+    const users = await query;
+
 
     res.status(200).json({
         success: true,
-        users
+        count: users.length,
+        data: users
     });
 });
 

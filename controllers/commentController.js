@@ -1,6 +1,7 @@
 const Comment = require('../models/Comment');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
+const { applyPagination } = require('../utils/queryHelper');
 
 
 exports.addComment = catchAsync(async (req, res, next) => {
@@ -28,15 +29,29 @@ exports.addComment = catchAsync(async (req, res, next) => {
 
 exports.getComments = catchAsync(async (req, res, next) => {
 
-    const comments = await Comment.find({
+    let query = Comment.find({
         issue: req.params.issueId
     })
-    .sort({ createdAt: 1 })
-    .populate('author', 'name');
 
+    .sort({
+        createdAt: 1
+    })
+
+    .populate(
+        'author',
+        'name'
+    );
+
+    query = applyPagination(
+        query,
+        req.query
+    );
+
+    const comments = await query;
     res.status(200).json({
         success: true,
-        comments
+        count: comments.length,
+        data: comments
     });
 });
 

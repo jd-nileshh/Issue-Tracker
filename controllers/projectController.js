@@ -3,6 +3,7 @@ const User = require('../models/User');
 
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
+const{applyPagination} = require('../utils/queryHelper');
 
 
 exports.createProject = catchAsync(async (req, res, next) => {
@@ -35,13 +36,22 @@ exports.createProject = catchAsync(async (req, res, next) => {
 
 exports.getProjects = catchAsync(async (req, res, next) => {
 
-    const projects = await Project.find({
+    let query = Project.find({
         status: 'active'
     });
+    
+    query = applyPagination(
+        query,
+        req.query
+    );
+
+    const projects = await query;
+
 
     res.status(200).json({
         success: true,
-        projects
+        count: projects.length,
+        data: projects
     });
 });
 

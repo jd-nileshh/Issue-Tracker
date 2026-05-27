@@ -1,6 +1,6 @@
 const Issue = require('../models/Issue');
 const ActivityLog = require('../models/ActivityLog');
-
+const { applyPagination , buildPaginationMeta } = require('../utils/queryHelper');
 
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
@@ -43,15 +43,86 @@ exports.createIssue = catchAsync(async (req, res, next) => {
 
 
 exports.getIssues = catchAsync(async (req, res, next) => {
+    
+    const filter = {};
 
-    const issues = await Issue.find()
+    if (req.query.project) {
+        filter.project = req.query.project;
+    }
+
+    if (req.query.status) {
+        filter.status = req.query.status;
+    }
+
+    if (req.query.priority) {
+        filter.priority = req.query.priority;
+    }
+
+    if (req.query.type) {
+        filter.type = req.query.type;
+    }
+
+    if (req.query.assignee) {
+        filter.assignee = req.query.assignee;
+    }
+
+    if (req.query.search) {
+
+         filter.$text = {
+           $search: req.query.search
+         };
+    }
+
+    let sort = {
+    createdAt: -1
+};
+
+
+if (req.query.sortBy) {
+
+    const [field, order] =
+        req.query.sortBy.split('_');
+
+    sort = {
+        [field]:
+            order === 'asc'
+                ? 1
+                : -1
+    };
+}
+
+let query =  Issue.find(filter)
+        .sort(sort)
         .populate('reporter', 'name email')
         .populate('assignee', 'name email')
         .populate('labels', 'name');
 
+    query = applyPagination(
+        query,
+        req.query
+    );
+
+    const issues = await query;
+
+    const totalCount = await Issue.countDocuments(filter);
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 20;
+    if (limit > 100) {
+        limit = 100;
+    }
+    const pagination = buildPaginationMeta(
+            totalCount,
+            page,
+            limit
+        );
+
+
+
     res.status(200).json({
         success: true,
-        issues
+        pagination,
+        count: issues.length,
+        data: issues
     });
 });
 
