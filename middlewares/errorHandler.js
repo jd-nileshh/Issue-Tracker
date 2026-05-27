@@ -9,7 +9,7 @@ exports.errorHandler = (err,req,res,next) => {
 
     error.statusCode = err.statusCode || 500;
 
-    if(err.name === 'castError'){
+    if(err.name === 'CastError'){
         error = new AppError(
             'Resource not found',
             400
@@ -36,7 +36,7 @@ exports.errorHandler = (err,req,res,next) => {
 
 
 
-    res.status(err.statusCode).json({
+    res.status(error.statusCode).json({
         success: false,
         status: error.status,
         message: error.message,
