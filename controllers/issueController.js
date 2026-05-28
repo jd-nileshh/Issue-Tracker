@@ -92,10 +92,14 @@ if (req.query.sortBy) {
 }
 
 let query =  Issue.find(filter)
+        .select(
+        'title type status priority reporter assignee createdAt'
+        )
         .sort(sort)
         .populate('reporter', 'name email')
         .populate('assignee', 'name email')
-        .populate('labels', 'name');
+        .populate('labels', 'name')
+        .lean();
 
     query = applyPagination(
         query,
@@ -134,7 +138,8 @@ exports.getIssueById = catchAsync(async (req, res, next) => {
         .populate('reporter', 'name email')
         .populate('assignee', 'name email')
         .populate('project', 'title description status')
-        .populate('labels', 'name');
+        .populate('labels', 'name')
+        .lean();
 
     if (!issue) {
         return next(new AppError('Issue not found', 404));
@@ -317,7 +322,8 @@ exports.getIssueActivity = catchAsync(async (req, res, next) => {
         issue: req.params.id
     })
     .sort({ createdAt: -1 })
-    .populate('actor', 'name');
+    .populate('actor', 'name')
+    .lean();
 
     res.status(200).json({
         success: true,

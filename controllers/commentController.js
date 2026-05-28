@@ -40,7 +40,7 @@ exports.getComments = catchAsync(async (req, res, next) => {
     .populate(
         'author',
         'name'
-    );
+    ).lean();
 
     query = applyPagination(
         query,

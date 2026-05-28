@@ -38,7 +38,7 @@ exports.getProjects = catchAsync(async (req, res, next) => {
 
     let query = Project.find({
         status: 'active'
-    });
+    }).lean();
     
     query = applyPagination(
         query,
@@ -60,7 +60,8 @@ exports.getProjects = catchAsync(async (req, res, next) => {
 exports.getProjectById = catchAsync(async (req, res, next) => {
 
     const project = await Project.findById(req.params.id)
-        .populate('owner', 'name email');
+        .populate('owner', 'name email')
+        .lean();
 
     if (!project) {
         return next(new AppError('Project not found', 404));

@@ -1,24 +1,21 @@
+const logger = require("../config/logger");
+
 exports.requestLogger = (req, res, next) => {
 
-    console.log('LOGGER RUNNING');
+    logger.info("LOGGER RUNNING");
 
     req.startTime = Date.now();
 
-    res.on('finish', () => {
+    res.on("finish", () => {
 
         const elapsedTime =
             Date.now() - req.startTime;
 
-        console.log(
-            'Request:',
-            req.method,
-            req.originalUrl,
-            '| Status:',
-            res.statusCode,
-            '| Duration:',
-            `${elapsedTime}ms`,
-            '| Request ID:',
-            req.requestId
+        logger.info(
+            `Request: ${req.method} ${req.originalUrl} | ` +
+            `Status: ${res.statusCode} | ` +
+            `Duration: ${elapsedTime}ms | ` +
+            `Request ID: ${req.requestId}`
         );
     });
 

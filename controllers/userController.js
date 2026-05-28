@@ -22,7 +22,8 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
     }
 
     let query = User.find(filter)
-        .select('-password');
+        .select('-password')
+        .lean();
 
     query = applyPagination(
         query,
@@ -44,7 +45,8 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 exports.getUserById = catchAsync(async (req, res, next) => {
 
     const user = await User.findById(req.params.id)
-        .select('-password');
+        .select('-password')
+        .lean();
 
     if (!user) {
         return next(new AppError('User not found', 404));

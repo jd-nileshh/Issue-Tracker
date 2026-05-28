@@ -1,5 +1,5 @@
 const Label = require('../models/Label');
-const Project = require('../models/Project');
+
 
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
@@ -35,7 +35,7 @@ exports.getLabels = catchAsync(async (req, res, next) => {
 
     const labels = await Label.find({
         project: req.params.projectId
-    });
+    }).lean();
 
     res.status(200).json({
         success: true,

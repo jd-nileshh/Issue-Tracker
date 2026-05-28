@@ -55,4 +55,10 @@ issueSchema.index({assignee: 1});
 issueSchema.index({status : 1});
 issueSchema.index({priority : 1});
 
+issueSchema.index({
+    project: 1,
+    status: 1,
+    priority: 1
+});
+
 module.exports = mongoose.model('Issue', issueSchema);

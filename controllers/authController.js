@@ -8,7 +8,7 @@ exports.register = catchAsync(async (req, res, next) => {
 
     const { name, email, password } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email }).lean();
 
     if (existingUser) {
         return next(new AppError('Email is already registered', 409));

@@ -1,17 +1,31 @@
 const app = require('./app');
-const { PORT } = require('./config/config.js');
-const connectDB = require('./config/database.js')
+const { PORT,JWT_SECRET } = require('./config/config.js');
+const connectDB = require('./config/database.js');
+const logger = require('./config/logger');
 
-async function startServer(){
-    try{
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+
+    logger.error(
+        'JWT_SECRET is missing or shorter than 32 characters'
+    );
+
+    process.exit(1);
+}
+
+async function startServer() {
+    try {
         await connectDB();
 
         app.listen(PORT, () => {
-        console.log('Server is running on port ' + PORT);
+            logger.info(`Server is running on port ${PORT}`);
         });
-    }catch(error){
-        console.log('Error starting server:' , error);
+
+    } catch (error) {
+
+        logger.error(`Error starting server: ${error.message}`);
+
         process.exit(1);
     }
 }
-startServer()
+
+startServer();
