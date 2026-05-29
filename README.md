@@ -104,7 +104,7 @@ Before running the project, make sure you have installed:
 ## 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone <https://github.com/jd-nileshh/Issue-Tracker.git>
 ```
 
 ---
